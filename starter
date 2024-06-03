@@ -1,0 +1,62 @@
+forge install OpenZeppelin/openzeppelin-contracts
+// forge install is command which is used for installing  dependencies 
+// <https://github.com/OpenZeppelin/openzeppelin-contracts>
+// use {{username}}/{{repo_name}} from the github url
+
+forge remappings > remappings.txt
+//text file wil be generated
+
+//past it in the foundry toml
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/",
+    "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+    "forge-std/=lib/forge-std/src/",
+    "openzeppelin-contracts/=lib/openzeppelin-contracts/",
+]
+
+
+scripting 
+
+The .env file should follow this format:
+
+
+SEPOLIA_RPC_URL=
+PRIVATE_KEY=
+ETHERSCAN_API_KEY=
+
+
+
+foundary toml
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+
+
+
+
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+import "forge-std/Script.sol";
+import "../src/NFT.sol";
+
+contract MyScript is Script {
+    function run() external {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        NFT nft = new NFT("NFT_tutorial", "TUT", "baseUri");
+
+        vm.stopBroadcast();
+    }
+}
+
+
+# To load the variables in the .env file
+source .env
+
+# To deploy and verify our contract
+forge script --chain sepolia script/NFT.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
